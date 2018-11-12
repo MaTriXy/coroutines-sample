@@ -5,6 +5,11 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlin.system.measureTimeMillis
 
 class DetailActivity : AppCompatActivity() {
 
@@ -15,23 +20,22 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
 
-        progress.visibility = View.VISIBLE
+        GlobalScope.launch(Dispatchers.Main) {
 
-        val startTime = System.currentTimeMillis()
+            progress.visibility = View.VISIBLE
 
-        request.run("cat") { cats ->
+            lateinit var result: List<String>
 
-            request.run("elephant") { elephants ->
-
-                val result = cats + elephants
-
-                val totalSecs = (System.currentTimeMillis() - startTime) / 1000.0
-
-                counter.text = "${result.count()} items - $totalSecs seconds"
-
-                progress.visibility = View.GONE
+            val timeMillis = measureTimeMillis {
+                val cats = async { request.run("cat") }
+                val elephants = async { request.run("elephant") }
+                result = cats.await() + elephants.await()
             }
 
+            counter.text = "${result.count()} items - ${timeMillis / 1000.0} seconds"
+
+            progress.visibility = View.GONE
         }
+
     }
 }

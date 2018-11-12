@@ -1,18 +1,12 @@
 package com.antonioleiva.coroutines
 
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.delay
 
 class ConnectionChecker {
 
-    fun checkConnection(callback: (Boolean) -> Unit) {
-
-        doAsync {
-            Thread.sleep(2000)
-            uiThread {
-                callback(true)
-            }
-        }
+    suspend fun checkConnection(): Boolean {
+        delay(2000)
+        return true
     }
 
 }

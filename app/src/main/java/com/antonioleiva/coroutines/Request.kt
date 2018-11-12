@@ -1,19 +1,12 @@
 package com.antonioleiva.coroutines
 
-import org.jetbrains.anko.doAsync
-import org.jetbrains.anko.uiThread
+import kotlinx.coroutines.delay
 
 class Request {
 
-    fun run(type: String, callback: (List<String>) -> Unit) {
-        doAsync {
-            Thread.sleep((type.count() * 1000).toLong())
-            val res = (1..type.count()).map { "$type $it" }
-
-            uiThread {
-                callback(res)
-            }
-        }
+    suspend fun run(type: String): List<String> {
+        delay((type.count() * 1000).toLong())
+        return (1..type.count()).map { "$type $it" }
     }
 
 }
